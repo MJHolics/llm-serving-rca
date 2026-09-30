@@ -1,0 +1,66 @@
+{
+ "calibration": {
+  "D2_thr": 1.062488905764992,
+  "D3_k": 2.0
+ },
+ "D1_static_SLO_1.5s": {
+  "recall": 0.6,
+  "fa_per_hour": 0.0,
+  "false_alarms": 0,
+  "normal_hours": 0.017,
+  "delay_median_s": 4.000000000000007,
+  "delay_max_s": 5.799999999999983,
+  "recall_by_fault": {
+   "surge": 1.0,
+   "longctx": 1.0,
+   "longout": 0.0,
+   "gpu_hog": 1.0,
+   "cpu_hog": 0.0
+  }
+ },
+ "D2_quantile_1.06s": {
+  "recall": 1.0,
+  "fa_per_hour": 0.0,
+  "false_alarms": 0,
+  "normal_hours": 0.017,
+  "delay_median_s": 3.000000000000007,
+  "delay_max_s": 7.0,
+  "recall_by_fault": {
+   "surge": 1.0,
+   "longctx": 1.0,
+   "longout": 1.0,
+   "gpu_hog": 1.0,
+   "cpu_hog": 1.0
+  }
+ },
+ "D3_rolling_z_k2.0": {
+  "recall": 0.2,
+  "fa_per_hour": 0.0,
+  "false_alarms": 0,
+  "normal_hours": 0.017,
+  "delay_median_s": 6.799999999999983,
+  "delay_max_s": 6.799999999999983,
+  "recall_by_fault": {
+   "surge": 0.0,
+   "longctx": 0.0,
+   "longout": 0.0,
+   "gpu_hog": 1.0,
+   "cpu_hog": 0.0
+  }
+ },
+ "D4_isolation_forest": {
+  "recall": 1.0,
+  "fa_per_hour": 0.0,
+  "false_alarms": 0,
+  "normal_hours": 0.017,
+  "delay_median_s": 3.0,
+  "delay_max_s": 5.799999999999983,
+  "recall_by_fault": {
+   "surge": 1.0,
+   "longctx": 1.0,
+   "longout": 1.0,
+   "gpu_hog": 1.0,
+   "cpu_hog": 1.0
+  }
+ }
+}

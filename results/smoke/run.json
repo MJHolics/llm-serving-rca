@@ -1,0 +1,17 @@
+{
+ "run": "smoke",
+ "reps": 1,
+ "seed": 0,
+ "base_users": 8,
+ "warmup": 20,
+ "fault_sec": 20,
+ "gap_sec": 20,
+ "faults": "surge,longctx,longout,gpu_hog,cpu_hog",
+ "schedule": [
+  "longout",
+  "longctx",
+  "surge",
+  "cpu_hog",
+  "gpu_hog"
+ ]
+}

@@ -1,0 +1,330 @@
+{
+ "summary": {
+  "R1_max_deviation": {
+   "top1_acc": 0.8,
+   "n": 20,
+   "by_fault": {
+    "surge": 1.0,
+    "longctx": 1.0,
+    "longout": 0.0,
+    "gpu_hog": 1.0,
+    "cpu_hog": 1.0
+   },
+   "confusion": [
+    [
+     4,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     4,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     4,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     4,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     4,
+     0
+    ]
+   ],
+   "errors": [
+    {
+     "true": "longout",
+     "pred": "longctx",
+     "top_metric": "kv_usage"
+    },
+    {
+     "true": "longout",
+     "pred": "longctx",
+     "top_metric": "kv_usage"
+    },
+    {
+     "true": "longout",
+     "pred": "longctx",
+     "top_metric": "kv_usage"
+    },
+    {
+     "true": "longout",
+     "pred": "longctx",
+     "top_metric": "kv_usage"
+    }
+   ]
+  },
+  "R2_rules_v1_smoke": {
+   "top1_acc": 0.8,
+   "n": 20,
+   "by_fault": {
+    "surge": 1.0,
+    "longctx": 1.0,
+    "longout": 1.0,
+    "gpu_hog": 0.0,
+    "cpu_hog": 1.0
+   },
+   "confusion": [
+    [
+     4,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     4,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     4,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     4,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     4,
+     0
+    ]
+   ],
+   "errors": [
+    {
+     "true": "gpu_hog",
+     "pred": "cpu_hog"
+    },
+    {
+     "true": "gpu_hog",
+     "pred": "cpu_hog"
+    },
+    {
+     "true": "gpu_hog",
+     "pred": "cpu_hog"
+    },
+    {
+     "true": "gpu_hog",
+     "pred": "cpu_hog"
+    }
+   ]
+  },
+  "R2b_rules_v2_dev": {
+   "top1_acc": 1.0,
+   "n": 20,
+   "by_fault": {
+    "surge": 1.0,
+    "longctx": 1.0,
+    "longout": 1.0,
+    "gpu_hog": 1.0,
+    "cpu_hog": 1.0
+   },
+   "confusion": [
+    [
+     4,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     4,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     4,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     4,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     4,
+     0
+    ]
+   ],
+   "errors": []
+  },
+  "R3_random_forest": {
+   "top1_acc": 1.0,
+   "n": 20,
+   "by_fault": {
+    "surge": 1.0,
+    "longctx": 1.0,
+    "longout": 1.0,
+    "gpu_hog": 1.0,
+    "cpu_hog": 1.0
+   },
+   "confusion": [
+    [
+     4,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     4,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     4,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     4,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     4,
+     0
+    ]
+   ],
+   "errors": []
+  },
+  "R3b_logistic": {
+   "top1_acc": 1.0,
+   "n": 20,
+   "by_fault": {
+    "surge": 1.0,
+    "longctx": 1.0,
+    "longout": 1.0,
+    "gpu_hog": 1.0,
+    "cpu_hog": 1.0
+   },
+   "confusion": [
+    [
+     4,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     4,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     4,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     4,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     4,
+     0
+    ]
+   ],
+   "errors": []
+  }
+ },
+ "rf_importance": {
+  "vllm_cpu": 0.13224849933034521,
+  "gen_tps": 0.1285392711259049,
+  "running": 0.12618022481082317,
+  "host_cpu": 0.1244681524648325,
+  "gpu_power": 0.10106196423839071,
+  "kv_usage": 0.09201456880559589,
+  "lat_p90": 0.08322350107558078,
+  "prompt_tps": 0.05952849691855754,
+  "itl": 0.04203602635481654,
+  "gpu_util": 0.036641413112613465,
+  "prompt_per_req": 0.02805700225919642,
+  "done_rps": 0.020174512335765168,
+  "gen_per_running": 0.0162901034083378,
+  "ttft_p90": 0.00932381838290662,
+  "waiting": 0.0001377664569357012,
+  "preempt": 7.467891939769707e-05
+ }
+}

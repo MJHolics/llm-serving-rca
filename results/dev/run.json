@@ -1,0 +1,32 @@
+{
+ "run": "dev",
+ "reps": 4,
+ "seed": 1,
+ "base_users": 8,
+ "warmup": 90,
+ "fault_sec": 60,
+ "gap_sec": 60,
+ "faults": "surge,longctx,longout,gpu_hog,cpu_hog",
+ "schedule": [
+  "longout",
+  "gpu_hog",
+  "cpu_hog",
+  "surge",
+  "longctx",
+  "surge",
+  "longout",
+  "longctx",
+  "cpu_hog",
+  "gpu_hog",
+  "longout",
+  "gpu_hog",
+  "cpu_hog",
+  "surge",
+  "longctx",
+  "longctx",
+  "surge",
+  "longout",
+  "cpu_hog",
+  "gpu_hog"
+ ]
+}
