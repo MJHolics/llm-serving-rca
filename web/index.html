@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0f14">
+<title>AI 서버 관제탑 — 장애를 넣으면 몇 초 만에 원인까지</title>
+<meta name="description" content="LLM 추론 서버에 장애 다섯 가지를 넣어 잰 41분 기록을 재생합니다. 탐지와 원인 판정은 이 브라우저 안에서 다시 계산합니다.">
+<style>
+  :root {
+    --bg: #0b0f14; --panel: #131a22; --line: #243140; --text: #e8eef5; --dim: #8b9bb0;
+    --ok: #2fbf71; --ng: #ff3b4e; --accent: #5bc0ff; --warn: #f08a3c;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text);
+    font-family: "Pretendard", "Malgun Gothic", "Apple SD Gothic Neo", system-ui, sans-serif; }
+  body { padding: 16px 16px 40px; }
+  main { max-width: 1080px; margin: 0 auto; }
+  header h1 { text-wrap: balance; font-size: clamp(22px, 4.6vw, 34px); margin: 4px 0 6px; letter-spacing: -0.02em; }
+  header p { margin: 0 0 14px; color: var(--dim); font-size: 15px; line-height: 1.55; }
+  header b { color: var(--text); }
+
+  .status { border: 3px solid var(--line); border-radius: 14px; background: var(--panel); padding: 14px 16px; transition: border-color .15s; }
+  .status[data-kind="ok"] { border-color: var(--ok); }
+  .status[data-kind="alarm"] { border-color: var(--warn); }
+  .status[data-kind="cause"] { border-color: var(--ng); }
+  .status .top { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+  .tag { border: 1px solid var(--line); padding: 3px 9px; border-radius: 999px; font-size: 12px; color: var(--dim); white-space: nowrap; }
+  .status .v { font-weight: 800; font-size: clamp(20px, 4.4vw, 30px); color: var(--ok); }
+  .status[data-kind="alarm"] .v { color: var(--warn); } .status[data-kind="cause"] .v { color: var(--ng); }
+  .status .w { margin-top: 3px; font-size: 14.5px; line-height: 1.5; min-height: 44px; }
+  .status .w small { color: var(--dim); font-size: 13px; }
+
+  .inject { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin: 12px 0 4px; }
+  @media (max-width: 760px) { .inject { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  button { font: inherit; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 10px; cursor: pointer; text-align: left; }
+  button b { display: block; font-size: 15px; }
+  button span { display: block; color: var(--dim); font-size: 12px; margin-top: 2px; line-height: 1.35; }
+  button[aria-pressed="true"] { border-color: var(--accent); background: rgba(91, 192, 255, .12); }
+  .hint { color: var(--dim); font-size: 12.5px; margin: 6px 2px 12px; line-height: 1.5; }
+
+  .grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 14px; }
+  @media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+  .grid > * { min-width: 0; }
+  .charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; align-content: start; }
+  .chart { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px 6px; min-width: 0; transition: border-color .15s; }
+  .chart[data-on="1"] { border-color: var(--ng); }
+  .chart .h { display: flex; justify-content: space-between; gap: 6px; font-size: 12.5px; color: var(--dim); }
+  .chart .h b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .chart .r { font-size: 11.5px; color: var(--dim); height: 15px; font-variant-numeric: tabular-nums; }
+  .chart[data-on="1"] .r { color: var(--ng); }
+  .chart canvas { display: block; width: 100%; height: 64px; }
+
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; }
+  .panel + .panel { margin-top: 14px; }
+  .panel h2 { font-size: 13px; color: var(--dim); font-weight: 600; margin: 0 0 10px; letter-spacing: .02em; }
+  .judge { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: 14px; align-items: baseline; }
+  .judge dt { color: var(--dim); font-size: 12.5px; } .judge dd { margin: 0; font-weight: 700; }
+  .judge dd.miss { color: var(--warn); } .judge dd.hit { color: var(--ok); } .judge dd.wait { color: var(--dim); font-weight: 400; }
+  .why { font-size: 13.5px; line-height: 1.6; margin: 10px 0 0; min-height: 66px; }
+  .small { font-size: 12px; color: var(--dim); margin: 10px 0 0; line-height: 1.5; }
+  table { border-collapse: collapse; width: 100%; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+  td, th { border-bottom: 1px solid var(--line); padding: 4px 6px; text-align: left; }
+  th { color: var(--dim); font-weight: 500; }
+  .nums { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
+  .nums div { border: 1px solid var(--line); border-radius: 10px; padding: 8px 4px; }
+  .nums b { display: block; font-size: 20px; } .nums span { font-size: 11.5px; color: var(--dim); }
+  details { margin-top: 14px; color: var(--dim); font-size: 13.5px; line-height: 1.6; }
+  details summary { cursor: pointer; color: var(--text); }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>AI 서버 관제탑</h1>
+    <p>사내 LLM 추론 서버가 느려졌을 때 "무엇 때문인지"를 몇 초 안에 말해 주는 화면을 떠올리고 만들었습니다.
+      아래는 <b>실제 서버에 장애 다섯 가지를 넣어 잰 41분 기록의 재생</b>입니다. 지금 서버가 돌고 있는 것은 아니고, <b>탐지와 원인 판정은 이 브라우저가 기록 위에서 다시 계산</b>합니다.</p>
+  </header>
+
+  <section class="status" id="status" data-kind="ok">
+    <div class="top"><div class="v" id="verdict">불러오는 중</div><div class="tag" id="clock">기록 재생</div></div>
+    <div class="w" id="why"></div>
+  </section>
+
+  <div class="inject" id="inject"></div>
+  <p class="hint" id="hint">버튼을 누르면 그 장애를 넣었던 구간으로 넘어갑니다. 누르지 않아도 다섯 가지가 차례로 재생됩니다.</p>
+
+  <div class="grid">
+    <section class="charts" id="charts"></section>
+    <aside>
+      <div class="panel">
+        <h2>원인 판정</h2>
+        <dl class="judge">
+          <dt>규칙으로 판정</dt><dd id="jRule" class="wait">—</dd>
+          <dt>가장 크게 튄 지표로 읽으면</dt><dd id="jNaive" class="wait">—</dd>
+          <dt>실제로 넣은 장애</dt><dd id="jTruth" class="wait">—</dd>
+        </dl>
+        <p class="why" id="jWhy"></p>
+      </div>
+      <div class="panel">
+        <h2>이 기록 전체(장애 20건)</h2>
+        <div class="nums">
+          <div><b id="nDetect">—</b><span>탐지 · 오경보 0</span></div>
+          <div><b id="nDelay">—</b><span>탐지까지(중앙)</span></div>
+          <div><b id="nCause">—</b><span>원인 맞힘</span></div>
+        </div>
+        <p class="small" id="nNote"></p>
+      </div>
+      <div class="panel">
+        <h2>방금 본 장애</h2>
+        <table><thead><tr><th>넣은 장애</th><th>탐지</th><th>판정</th><th>지표만 보면</th></tr></thead><tbody id="log"></tbody></table>
+      </div>
+    </aside>
+  </div>
+
+  <details>
+    <summary>어떻게 잰 기록인가, 무엇이 재생이고 무엇이 계산인가</summary>
+    <p>RTX 4080 SUPER 한 장에서 vLLM으로 Qwen2.5-1.5B를 띄우고, 동시 사용자 8명의 평상시 부하 위에 장애 다섯 가지를 무작위 순서로 60초씩 넣었습니다(20건, 약 41분).
+      서버 지표·GPU·CPU·클라이언트 지연을 1초마다 기록했습니다. 화면의 선은 그 기록입니다.</p>
+    <p>이상 점수는 다른 날 잰 기록(dev, 장애 15건)의 정상 구간으로 학습한 Isolation Forest(나무 300그루)를 브라우저에 실어 초마다 계산합니다. 3초 연속 기준을 넘으면 경보입니다.
+      원인은 장애를 넣은 뒤 5~20초 구간의 평균이 평상시에서 몇 표준편차 벗어났는지로 규칙이 판정합니다. 규칙과 기준값은 dev 기록에서 정하고 이 기록(test)을 보기 전에 고정했습니다.
+      파이썬 원본과 이 화면의 계산은 이상 점수(차이 10억분의 1 미만), 장애 20건의 탐지 시각, 원인 판정이 모두 같습니다.</p>
+    <p>한계: GPU 한 장·모델 하나·장애 다섯 가지뿐입니다. 장애가 겹치거나 처음 보는 종류면 규칙은 "모름"을 냅니다. 원인 구간은 장애를 넣은 시각 기준이라, 실제 운영에서는 경보 시각 기준으로 바꿔야 합니다.
+      코드와 측정: <a href="https://github.com/MJHolics/llm-serving-rca">github.com/MJHolics/llm-serving-rca</a></p>
+  </details>
+</main>
+<script type="module" src="app.js"></script>
+</body>
+</html>
